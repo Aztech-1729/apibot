@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test APIs - AzTech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'aztech-purple': '#8b5cf6',
+                        'aztech-indigo': '#6366f1',
+                        'aztech-dark': '#0f0f23',
+                        'aztech-card': '#1a1a2e',
+                        'aztech-border': '#2a2a4a',
+                        'aztech-text': '#e2e8f0',
+                        'aztech-muted': '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .code-block {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .glow-border {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+        .glow-border:hover {
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-aztech-dark text-aztech-text font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-aztech-card border-r border-aztech-border fixed h-full">
+            <div class="p-6 border-b border-aztech-border">
+                <h1 class="text-2xl font-bold text-aztech-purple">
+                    <i class="fas fa-shield-halved mr-2"></i>AzTech
+                </h1>
+            </div>
+            <nav class="p-4">
+                <a href="/admin/dashboard?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg">
+                    <i class="fas fa-gauge-high w-6"></i> Dashboard
+                </a>
+                <a href="/admin/users?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-users w-6"></i> Users
+                </a>
+                <a href="/admin/apikeys?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-key w-6"></i> API Keys
+                </a>
+                <a href="/admin/usage?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-chart-bar w-6"></i> Usage Stats
+                </a>
+                <a href="/admin/orders?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-shopping-cart w-6"></i> Orders
+                </a>
+                <a href="/admin/test-api?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-purple bg-purple-500/10 border-l-4 border-aztech-purple rounded-r-lg font-medium mt-2">
+                    <i class="fas fa-flask w-6"></i> Test APIs
+                </a>
+                <a href="/admin/settings?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-cog w-6"></i> Settings
+                </a>
+                <a href="/admin/login" class="flex items-center px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 rounded-r-lg mt-8">
+                    <i class="fas fa-sign-out-alt w-6"></i> Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 flex-1 overflow-y-auto">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-white flex items-center">
+                        <i class="fas fa-flask mr-3 text-aztech-purple"></i>
+                        Test APIs
+                    </h2>
+                    <p class="text-aztech-muted mt-2">Test your API endpoints and view responses in real-time</p>
+                </div>
+
+                <!-- Test Panel -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Request Form -->
+                    <div>
+                        <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6 glow-border transition-all duration-300">
+                            <h5 class="text-xl font-semibold text-aztech-purple mb-5 flex items-center">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send Request
+                            </h5>
+                            <form method="POST" action="/admin/test-api?token={{ token }}" class="space-y-5">
+                                <div>
+                                    <label class="block text-aztech-text text-sm font-medium mb-2 flex items-center">
+                                        <i class="fas fa-key mr-2 text-aztech-purple"></i>API Key
+                                    </label>
+                                    <div class="relative">
+                                        <select name="api_key" required 
+                                                class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-aztech-text focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all duration-200 appearance-none cursor-pointer">
+                                            <option value="">Select API Key...</option>
+                                            {% for key, name in api_keys %}
+                                            <option value="{{ key }}">{{ name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-aztech-muted pointer-events-none"></i>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-aztech-text text-sm font-medium mb-2 flex items-center">
+                                        <i class="fas fa-route mr-2 text-aztech-purple"></i>Endpoint
+                                    </label>
+                                    <div class="relative">
+                                        <select name="endpoint" required 
+                                                class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-aztech-text focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all duration-200 appearance-none cursor-pointer">
+                                            <option value="health">GET /health - Health Check</option>
+                                            <option value="search">GET /search - Movie Search</option>
+                                            <option value="generate">POST /generate - Image Generation</option>
+                                            <option value="lookup">GET /lookup - Phone Lookup</option>
+                                            <option value="usage">GET /usage - Usage Stats</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-aztech-muted pointer-events-none"></i>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-aztech-text text-sm font-medium mb-2 flex items-center">
+                                        <i class="fas fa-terminal mr-2 text-aztech-purple"></i>Parameters
+                                    </label>
+                                    <div class="relative">
+                                        <input type="text" name="params" 
+                                               placeholder="e.g., query=movie_name"
+                                               class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-aztech-text focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all duration-200">
+                                    </div>
+                                    <p class="text-aztech-muted text-xs mt-2">Enter parameters as key=value pairs, separated by &</p>
+                                </div>
+
+                                <button type="submit" class="w-full bg-gradient-to-r from-aztech-purple to-violet-600 text-white font-semibold py-4 px-6 rounded-lg hover:from-violet-600 hover:to-aztech-purple transform hover:scale-[1.02] transition-all duration-200 shadow-lg flex items-center justify-center">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Send Test Request
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Quick Reference -->
+                        <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6 mt-6">
+                            <h5 class="text-lg font-semibold text-white mb-4 flex items-center">
+                                <i class="fas fa-book mr-2 text-aztech-purple"></i>
+                                Quick Reference
+                            </h5>
+                            <div class="space-y-3">
+                                <div class="bg-aztech-dark p-3 rounded-lg">
+                                    <code class="text-aztech-purple text-sm">/health</code>
+                                    <p class="text-aztech-muted text-xs mt-1">Check API status</p>
+                                </div>
+                                <div class="bg-aztech-dark p-3 rounded-lg">
+                                    <code class="text-aztech-purple text-sm">/search?query=movie</code>
+                                    <p class="text-aztech-muted text-xs mt-1">Search for movies</p>
+                                </div>
+                                <div class="bg-aztech-dark p-3 rounded-lg">
+                                    <code class="text-aztech-purple text-sm">/generate?prompt=text</code>
+                                    <p class="text-aztech-muted text-xs mt-1">Generate images</p>
+                                </div>
+                                <div class="bg-aztech-dark p-3 rounded-lg">
+                                    <code class="text-aztech-purple text-sm">/lookup?phone=number</code>
+                                    <p class="text-aztech-muted text-xs mt-1">Phone number lookup</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Response Panel -->
+                    <div>
+                        <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6 h-full glow-border transition-all duration-300">
+                            <h5 class="text-xl font-semibold text-aztech-purple mb-5 flex items-center">
+                                <i class="fas fa-code mr-2"></i>
+                                Response
+                            {% if test_result and not test_result.error %}
+                            <span class="ml-auto text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">
+                                <i class="fas fa-check-circle mr-1"></i>Success
+                            </span>
+                            {% endif %}
+                        </h5>
+                            {% if test_result %}
+                                {% if test_result.error %}
+                            <div class="bg-red-500/20 border border-red-500/30 rounded-lg p-4 text-red-400">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>{{ test_result.error }}
+                                {% if test_result.details %}
+                                <p class="text-sm mt-2 text-red-300">{{ test_result.details }}</p>
+                                {% endif %}
+                            </div>
+                                {% elif test_result.data and test_result.data.success == true and endpoint == 'search' %}
+                            <div class="space-y-3 max-h-[500px] overflow-y-auto">
+                                {% for result in test_result.data.results[:10] %}
+                                <div class="bg-aztech-dark border border-aztech-border rounded-lg p-4 hover:border-aztech-purple transition-all">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <h6 class="text-white font-medium">{{ result.title }}</h6>
+                                            <p class="text-aztech-muted text-sm mt-1">{{ result.source }}</p>
+                                        </div>
+                                        <a href="{{ result.link }}" target="_blank" class="ml-3 px-3 py-1 bg-aztech-purple/20 text-aztech-purple rounded-lg text-sm hover:bg-aztech-purple hover:text-white transition-all">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="text-center py-8 text-aztech-muted">
+                                    <i class="fas fa-search text-4xl mb-3"></i>
+                                    <p>No results found</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                                {% elif test_result.data and test_result.data.image and endpoint == 'generate' %}
+                            <div class="text-center">
+                                <img src="data:image/png;base64,{{ test_result.data.image | safe }}" alt="Generated Image" class="max-w-full rounded-lg shadow-lg">
+                                <p class="text-aztech-muted text-sm mt-3">Prompt: {{ test_result.data.prompt }}</p>
+                                <p class="text-green-400 text-xs mt-1">{{ test_result.data.remaining }} remaining</p>
+                            </div>
+                                {% elif test_result.data and test_result.data.usage and endpoint == 'usage' %}
+                            <div class="space-y-4">
+                                <div class="bg-aztech-dark p-4 rounded-lg">
+                                    <p class="text-white"><span class="text-aztech-muted">API Key:</span> <code class="text-aztech-purple">{{ test_result.data.api_key }}</code></p>
+                                    <p class="text-white"><span class="text-aztech-muted">Plan:</span> <span class="px-2 py-1 bg-aztech-purple/20 text-aztech-purple rounded">{{ test_result.data.plan }}</span></p>
+                                    <p class="text-white"><span class="text-aztech-muted">Date:</span> {{ test_result.data.date }}</p>
+                                </div>
+                                <div class="space-y-3">
+                                    {% for api_id, stats in test_result.data.usage.items() %}
+                                    <div class="bg-aztech-dark border border-aztech-border rounded-lg p-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h6 class="text-white font-medium">{{ stats.name | safe }}</h6>
+                                            <span class="text-xs px-2 py-1 rounded {% if stats.purchased %}bg-green-500/20 text-green-400{% else %}bg-red-500/20 text-red-400{% endif %}">
+                                                {% if stats.purchased %}Active{% else %}Inactive{% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 text-sm">
+                                            <div class="text-center">
+                                                <p class="text-aztech-muted text-xs">Used</p>
+                                                <p class="text-white font-medium">{{ stats.used }}</p>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-aztech-muted text-xs">Limit</p>
+                                                <p class="text-white font-medium">{{ stats.limit }}</p>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-aztech-muted text-xs">Remaining</p>
+                                                <p class="text-green-400 font-medium">{{ stats.remaining }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                                {% else %}
+                            <div class="code-block border border-aztech-border rounded-lg p-4 overflow-auto max-h-[500px]">
+                                <pre class="text-green-400 text-sm whitespace-pre-wrap break-words">{{ test_result|tojson(indent=2) }}</pre>
+                            </div>
+                                {% endif %}
+                            <div class="mt-4 flex items-center justify-between text-sm">
+                                <span class="text-aztech-muted">
+                                    <i class="fas fa-clock mr-1"></i> Response time: {{ test_result.elapsed if test_result.elapsed else '0.00s' }}
+                                </span>
+                                <button onclick="copyResponse()" class="text-aztech-purple hover:text-purple-400 transition-colors">
+                                    <i class="fas fa-copy mr-1"></i> Copy Response
+                                </button>
+                            </div>
+                            {% else %}
+                            <div class="flex flex-col items-center justify-center py-16 text-center">
+                                <div class="bg-aztech-dark rounded-full p-6 mb-4">
+                                    <i class="fas fa-terminal text-5xl text-aztech-purple pulse-animation"></i>
+                                </div>
+                                <h6 class="text-lg font-medium text-white mb-2">No Response Yet</h6>
+                                <p class="text-aztech-muted text-sm max-w-xs">
+                                    Send a request using the form to see the API response here
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Copy response to clipboard
+        function copyResponse() {
+            const pre = document.querySelector('pre');
+            if (pre) {
+                navigator.clipboard.writeText(pre.textContent).then(() => {
+                    alert('Response copied to clipboard!');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

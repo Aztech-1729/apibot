@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Detail - AzTech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'aztech-purple': '#8b5cf6',
+                        'aztech-indigo': '#6366f1',
+                        'aztech-dark': '#0f0f23',
+                        'aztech-card': '#1a1a2e',
+                        'aztech-border': '#2a2a4a',
+                        'aztech-text': '#e2e8f0',
+                        'aztech-muted': '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-aztech-dark text-aztech-text font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-aztech-card border-r border-aztech-border fixed h-full">
+            <div class="p-6 border-b border-aztech-border">
+                <h1 class="text-2xl font-bold text-aztech-purple">
+                    <i class="fas fa-shield-halved mr-2"></i>AzTech
+                </h1>
+            </div>
+            <nav class="p-4">
+                <a href="/admin/dashboard?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg">
+                    <i class="fas fa-gauge-high w-6"></i> Dashboard
+                </a>
+                <a href="/admin/users?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-purple bg-purple-500/10 border-l-4 border-aztech-purple rounded-r-lg font-medium">
+                    <i class="fas fa-users w-6"></i> Users
+                </a>
+                <a href="/admin/apikeys?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-key w-6"></i> API Keys
+                </a>
+                <a href="/admin/usage?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-chart-bar w-6"></i> Usage Stats
+                </a>
+                <a href="/admin/orders?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-shopping-cart w-6"></i> Orders
+                </a>
+                <a href="/admin/test-api?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-flask w-6"></i> Test APIs
+                </a>
+                <a href="/admin/settings?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-cog w-6"></i> Settings
+                </a>
+                <a href="/admin/login" class="flex items-center px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 rounded-r-lg mt-8">
+                    <i class="fas fa-sign-out-alt w-6"></i> Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 flex-1 overflow-y-auto">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-white flex items-center">
+                        <i class="fas fa-user-circle mr-3 text-aztech-purple"></i>
+                        User Profile
+                    </h2>
+                    <div class="flex space-x-3">
+                        <button onclick="toggleEditModal()" class="bg-aztech-purple text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-600 transition-colors duration-200 shadow-lg">
+                            <i class="fas fa-edit mr-2"></i>Edit User
+                        </button>
+                        <button onclick="toggleApiModal()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-600 transition-colors duration-200 shadow-lg">
+                            <i class="fas fa-key mr-2"></i>Manage API
+                        </button>
+                        <a href="/admin/users?token={{ token }}" class="bg-aztech-dark border border-aztech-border text-aztech-muted px-4 py-2 rounded-lg hover:border-aztech-purple hover:text-aztech-purple transition-all duration-200">
+                            <i class="fas fa-arrow-left mr-2"></i>Back
+                        </a>
+                    </div>
+                </div>
+
+                <!-- User Information Cards -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Basic Info -->
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6">
+                        <h5 class="text-xl font-semibold text-aztech-purple mb-5 flex items-center">
+                            <i class="fas fa-id-card mr-2"></i>
+                            Basic Information
+                        </h5>
+                        <div class="space-y-4">
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">User ID</span>
+                                <span class="font-mono text-white text-sm">{{ user._id }}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Name</span>
+                                <span class="text-white font-medium">{{ user.name }}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Telegram ID</span>
+                                <span class="font-mono text-white"><code>{{ user.telegram_id }}</code></span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Telegram Link</span>
+                                <a href="https://t.me/{{ user.telegram_id }}" target="_blank" class="text-sky-400 hover:text-sky-300">
+                                    <i class="fab fa-telegram mr-1"></i>Open Chat
+                                </a>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Joined</span>
+                                <span class="text-white">{{ user.joined.strftime('%Y-%m-%d %H:%M UTC') if user.joined else 'N/A' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Info -->
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6">
+                        <h5 class="text-xl font-semibold text-aztech-purple mb-5 flex items-center">
+                            <i class="fas fa-crown mr-2"></i>
+                            Subscription
+                        </h5>
+                        <div class="space-y-4">
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Current Plan</span>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                    {% if user.plan == 'free' %} bg-gray-500/20 text-gray-300
+                                    {% elif user.plan == 'paid' %} bg-yellow-500/20 text-yellow-400
+                                    {% elif user.plan == 'weekly' %} bg-purple-500/20 text-purple-400
+                                    {% elif user.plan == 'monthly' %} bg-indigo-500/20 text-indigo-400
+                                    {% endif %}">
+                                    {% if user.plan == 'free' %}Free Trial
+                                    {% elif user.plan == 'paid' %}Paid (24h)
+                                    {% elif user.plan == 'weekly' %}Weekly
+                                    {% elif user.plan == 'monthly' %}Monthly
+                                    {% else %}{{ user.plan|upper }}{% endif %}
+                                </span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Expires</span>
+                                <span class="text-white">{{ user.expires_at.strftime('%Y-%m-%d %H:%M UTC') if user.expires_at else 'Never' }}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Status</span>
+                                <span>
+                                    {% if user.active %}
+                                    <span class="text-green-400 flex items-center"><i class="fas fa-check-circle mr-1"></i> Active</span>
+                                    {% else %}
+                                    <span class="text-red-400 flex items-center"><i class="fas fa-times-circle mr-1"></i> Disabled</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-aztech-border">
+                                <span class="text-aztech-muted">Toggle Status</span>
+                                <a href="/admin/user/{{ user._id }}/toggle?token={{ token }}" class="px-3 py-1 rounded-lg text-sm font-medium {% if user.active %}bg-red-500/20 text-red-400 hover:bg-red-500/40{% else %}bg-green-500/20 text-green-400 hover:bg-green-500/40{% endif %}">
+                                    {% if user.active %}<i class="fas fa-ban mr-1"></i>Disable{% else %}<i class="fas fa-check mr-1"></i>Enable{% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Key Section -->
+                <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6 mb-8">
+                    <div class="flex justify-between items-center mb-5">
+                        <h5 class="text-xl font-semibold text-aztech-purple flex items-center">
+                            <i class="fas fa-key mr-2"></i>
+                            API Key
+                        </h5>
+                        <a href="/admin/user/{{ user._id }}/reset-key?token={{ token }}" onclick="return confirm('Generate new API key for this user?')" class="bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500 hover:text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-redo mr-1"></i>Regenerate
+                        </a>
+                    </div>
+                    <div class="bg-aztech-dark border border-aztech-border rounded-lg p-4 flex items-center justify-between">
+                        <code class="font-mono text-sky-400 text-lg">{{ user.api_key }}</code>
+                        <button onclick="copyApiKey()" class="text-aztech-muted hover:text-white transition-colors">
+                            <i class="fas fa-copy text-xl"></i>
+                        </button>
+                    </div>
+                    <p class="text-aztech-muted text-sm mt-2">Click regenerate to create a new API key for this user</p>
+                </div>
+
+                <!-- APIs Access Section -->
+                <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6 mb-8">
+                    <h5 class="text-xl font-semibold text-aztech-purple mb-5 flex items-center">
+                        <i class="fas fa-plug mr-2"></i>
+                        API Access
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Movie Search -->
+                        <div class="bg-aztech-dark border rounded-lg p-4 {% if 'movie_search' in user.apis %}border-green-500/50{% else %}border-aztech-border{% endif %}">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-white font-medium"><i class="fas fa-film mr-2 text-purple-400"></i>Movie Search</span>
+                                {% if 'movie_search' in user.apis %}
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle"></i> Active</span>
+                                {% else %}
+                                <span class="text-gray-500 text-sm">Inactive</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-aztech-muted text-sm">₹10/day • 200 req/day</div>
+                        </div>
+                        <!-- Image Generation -->
+                        <div class="bg-aztech-dark border rounded-lg p-4 {% if 'image_gen' in user.apis %}border-green-500/50{% else %}border-aztech-border{% endif %}">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-white font-medium"><i class="fas fa-image mr-2 text-pink-400"></i>Image Gen</span>
+                                {% if 'image_gen' in user.apis %}
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle"></i> Active</span>
+                                {% else %}
+                                <span class="text-gray-500 text-sm">Inactive</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-aztech-muted text-sm">₹15/day • 100 req/day</div>
+                        </div>
+                        <!-- Phone Lookup -->
+                        <div class="bg-aztech-dark border rounded-lg p-4 {% if 'phone_lookup' in user.apis %}border-green-500/50{% else %}border-aztech-border{% endif %}">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-white font-medium"><i class="fas fa-phone mr-2 text-green-400"></i>Phone Lookup</span>
+                                {% if 'phone_lookup' in user.apis %}
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle"></i> Active</span>
+                                {% else %}
+                                <span class="text-gray-500 text-sm">Inactive</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-aztech-muted text-sm">₹20/day • 50 req/day</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage History -->
+                <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg p-6">
+                    <h5 class="text-xl font-semibold text-aztech-purple mb-5 flex items-center">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        Usage History (Last 30 Days)
+                    </h5>
+                    {% if usage_history %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-aztech-dark">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-aztech-muted font-medium text-sm uppercase">Date</th>
+                                    <th class="px-4 py-3 text-left text-aztech-muted font-medium text-sm uppercase">Movie Search</th>
+                                    <th class="px-4 py-3 text-left text-aztech-muted font-medium text-sm uppercase">Image Gen</th>
+                                    <th class="px-4 py-3 text-left text-aztech-muted font-medium text-sm uppercase">Phone Lookup</th>
+                                    <th class="px-4 py-3 text-left text-aztech-muted font-medium text-sm uppercase">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-aztech-border">
+                                {% for usage in usage_history %}
+                                <tr class="hover:bg-purple-500/5">
+                                    <td class="px-4 py-3 text-white">{{ usage.date }}</td>
+                                    <td class="px-4 py-3 text-aztech-text">{{ usage.get('movie_search', 0) }}</td>
+                                    <td class="px-4 py-3 text-aztech-text">{{ usage.get('image_gen', 0) }}</td>
+                                    <td class="px-4 py-3 text-aztech-text">{{ usage.get('phone_lookup', 0) }}</td>
+                                    <td class="px-4 py-3 text-white font-medium">{{ usage.get('movie_search', 0) + usage.get('image_gen', 0) + usage.get('phone_lookup', 0) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8 text-aztech-muted">
+                        <i class="fas fa-chart-bar text-4xl mb-4 block opacity-50"></i>
+                        No usage history available
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-8 flex justify-end space-x-4">
+                    <a href="/admin/user/{{ user._id }}/delete?token={{ token }}" onclick="return confirm('Delete this user? This cannot be undone.')" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        <i class="fas fa-trash mr-2"></i>Delete User
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-aztech-card border border-aztech-border rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white"><i class="fas fa-user-edit mr-2 text-aztech-purple"></i>Edit User</h3>
+                <button onclick="toggleEditModal()" class="text-aztech-muted hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="/admin/user/{{ user._id }}/edit?token={{ token }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-aztech-text text-sm font-medium mb-2">Full Name</label>
+                    <input type="text" name="name" value="{{ user.name }}" required class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white focus:outline-none focus:border-aztech-purple">
+                </div>
+                <div>
+                    <label class="block text-aztech-text text-sm font-medium mb-2">Plan</label>
+                    <select name="plan" class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white focus:outline-none focus:border-aztech-purple">
+                        <option value="free" {% if user.plan == 'free' %}selected{% endif %}>Free</option>
+                        <option value="paid" {% if user.plan == 'paid' %}selected{% endif %}>Paid (24h)</option>
+                        <option value="weekly" {% if user.plan == 'weekly' %}selected{% endif %}>Weekly (7 days)</option>
+                        <option value="monthly" {% if user.plan == 'monthly' %}selected{% endif %}>Monthly (30 days)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-aztech-text text-sm font-medium mb-2">APIs Access</label>
+                    <div class="grid grid-cols-1 gap-2">
+                        <label class="flex items-center text-aztech-muted bg-aztech-dark p-3 rounded-lg cursor-pointer hover:bg-aztech-border">
+                            <input type="checkbox" name="apis" value="movie_search" {% if 'movie_search' in user.apis %}checked{% endif %} class="mr-3 w-4 h-4 accent-aztech-purple"> 
+                            <i class="fas fa-film mr-2 text-purple-400"></i> Movie Search
+                        </label>
+                        <label class="flex items-center text-aztech-muted bg-aztech-dark p-3 rounded-lg cursor-pointer hover:bg-aztech-border">
+                            <input type="checkbox" name="apis" value="image_gen" {% if 'image_gen' in user.apis %}checked{% endif %} class="mr-3 w-4 h-4 accent-aztech-purple"> 
+                            <i class="fas fa-image mr-2 text-pink-400"></i> Image Generation
+                        </label>
+                        <label class="flex items-center text-aztech-muted bg-aztech-dark p-3 rounded-lg cursor-pointer hover:bg-aztech-border">
+                            <input type="checkbox" name="apis" value="phone_lookup" {% if 'phone_lookup' in user.apis %}checked{% endif %} class="mr-3 w-4 h-4 accent-aztech-purple"> 
+                            <i class="fas fa-phone mr-2 text-green-400"></i> Phone Lookup
+                        </label>
+                    </div>
+                </div>
+                <div class="flex items-center mb-4">
+                    <input type="checkbox" name="active" id="active" {% if user.active %}checked{% endif %} class="w-4 h-4 accent-aztech-purple mr-2">
+                    <label for="active" class="text-aztech-text">Account Active</label>
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="toggleEditModal()" class="flex-1 px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white hover:bg-aztech-border">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-aztech-purple rounded-lg text-white hover:bg-purple-600 font-medium">
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleEditModal() {
+            document.getElementById('editUserModal').classList.toggle('hidden');
+        }
+
+        function toggleApiModal() {
+            document.getElementById('editUserModal').classList.toggle('hidden');
+        }
+
+        function copyApiKey() {
+            navigator.clipboard.writeText('{{ user.api_key }}').then(() => {
+                alert('API Key copied to clipboard!');
+            });
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('editUserModal').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

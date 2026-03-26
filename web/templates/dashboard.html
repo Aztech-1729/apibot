@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AzTech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'aztech-purple': '#8b5cf6',
+                        'aztech-indigo': '#6366f1',
+                        'aztech-dark': '#0f0f23',
+                        'aztech-card': '#1a1a2e',
+                        'aztech-border': '#2a2a4a',
+                        'aztech-text': '#e2e8f0',
+                        'aztech-muted': '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-aztech-dark text-aztech-text font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-aztech-card border-r border-aztech-border fixed h-full">
+            <div class="p-6 border-b border-aztech-border">
+                <h1 class="text-2xl font-bold text-aztech-purple">
+                    <i class="fas fa-shield-halved mr-2"></i>AzTech
+                </h1>
+            </div>
+            <nav class="p-4">
+                <a href="/admin/dashboard?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-purple bg-purple-500/10 border-l-4 border-aztech-purple rounded-r-lg font-medium">
+                    <i class="fas fa-gauge-high w-6"></i> Dashboard
+                </a>
+                <a href="/admin/users?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-users w-6"></i> Users
+                </a>
+                <a href="/admin/apikeys?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-key w-6"></i> API Keys
+                </a>
+                <a href="/admin/usage?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-chart-bar w-6"></i> Usage Stats
+                </a>
+                <a href="/admin/orders?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-shopping-cart w-6"></i> Orders
+                </a>
+                <a href="/admin/test-api?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-flask w-6"></i> Test APIs
+                </a>
+                <a href="/admin/settings?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-cog w-6"></i> Settings
+                </a>
+                <a href="/admin/login" class="flex items-center px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 rounded-r-lg mt-8">
+                    <i class="fas fa-sign-out-alt w-6"></i> Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 flex-1 overflow-y-auto">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-white flex items-center">
+                        <i class="fas fa-gauge-high mr-3 text-aztech-purple"></i>
+                        Dashboard
+                    </h2>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gradient-to-r from-aztech-purple to-violet-600 p-6 rounded-xl border border-aztech-border shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm font-medium">Total Users</p>
+                                <p class="text-3xl font-bold text-white mt-1">{{ total_users }}</p>
+                            </div>
+                            <i class="fas fa-users text-5xl text-white/20"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-aztech-indigo to-blue-600 p-6 rounded-xl border border-aztech-border shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm font-medium">Paid Users</p>
+                                <p class="text-3xl font-bold text-white mt-1">{{ paid_users }}</p>
+                            </div>
+                            <i class="fas fa-gem text-5xl text-white/20"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-emerald-500 to-green-600 p-6 rounded-xl border border-aztech-border shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm font-medium">Free Users</p>
+                                <p class="text-3xl font-bold text-white mt-1">{{ free_users }}</p>
+                            </div>
+                            <i class="fas fa-user text-5xl text-white/20"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-orange-500 to-red-600 p-6 rounded-xl border border-aztech-border shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm font-medium">Pending Orders</p>
+                                <p class="text-3xl font-bold text-white mt-1">{{ pending_orders }}</p>
+                            </div>
+                            <i class="fas fa-clock text-5xl text-white/20"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Stats -->
+                <div class="mb-8">
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg">
+                        <div class="p-6 border-b border-aztech-border">
+                            <h5 class="text-xl font-semibold text-white flex items-center">
+                                <i class="fas fa-chart-bar mr-3 text-aztech-purple"></i>
+                                Today's API Usage
+                            </h5>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {% for api_id, stats in usage_stats.items() %}
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-white font-medium">{{ stats.name }}</span>
+                                        <span class="text-aztech-muted text-sm">{{ stats.total }} / {{ stats.limit }}</span>
+                                    </div>
+                                    <div class="w-full bg-aztech-border rounded-full h-3">
+                                        <div class="bg-aztech-purple h-3 rounded-full transition-all duration-500" style="width: {{ stats.total|percentage(stats.limit) }}%"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Users & Orders Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Recent Users -->
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg">
+                        <div class="p-6 border-b border-aztech-border">
+                            <h5 class="text-xl font-semibold text-white flex items-center">
+                                <i class="fas fa-user-plus mr-3 text-aztech-purple"></i>
+                                Recent Users
+                            </h5>
+                        </div>
+                        <div class="p-6">
+                            {% if recent_users %}
+                            <div class="space-y-4">
+                                {% for user in recent_users[:5] %}
+                                <div class="flex items-center justify-between p-3 bg-aztech-dark rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-aztech-purple rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-white font-medium">{{ user.name }}</p>
+                                            <p class="text-aztech-muted text-sm">ID: {{ user.telegram_id }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium
+                                        {% if user.plan == 'free' %}bg-gray-500/20 text-gray-400
+                                        {% elif user.plan in ['weekly', 'monthly'] %}bg-emerald-500/20 text-emerald-400
+                                        {% else %}bg-purple-500/20 text-purple-400{% endif %}">
+                                        {{ user.plan|upper }}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-aztech-muted text-center py-4">No users yet</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg">
+                        <div class="p-6 border-b border-aztech-border">
+                            <h5 class="text-xl font-semibold text-white flex items-center">
+                                <i class="fas fa-shopping-bag mr-3 text-aztech-purple"></i>
+                                Recent Orders
+                            </h5>
+                        </div>
+                        <div class="p-6">
+                            {% if recent_orders %}
+                            <div class="space-y-4">
+                                {% for order in recent_orders[:5] %}
+                                <div class="flex items-center justify-between p-3 bg-aztech-dark rounded-lg">
+                                    <div>
+                                        <p class="text-white font-medium">#{{ order.order_id }}</p>
+                                        <p class="text-aztech-muted text-sm">{{ order.name }}</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium
+                                        {% if order.status == 'pending' %}bg-yellow-500/20 text-yellow-400
+                                        {% elif order.status == 'approved' %}bg-emerald-500/20 text-emerald-400
+                                        {% else %}bg-red-500/20 text-red-400{% endif %}">
+                                        {{ order.status|capitalize }}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-aztech-muted text-center py-4">No orders yet</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

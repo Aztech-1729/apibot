@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - AzTech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'aztech-purple': '#8b5cf6',
+                        'aztech-indigo': '#6366f1',
+                        'aztech-dark': '#0f0f23',
+                        'aztech-card': '#1a1a2e',
+                        'aztech-border': '#2a2a4a',
+                        'aztech-text': '#e2e8f0',
+                        'aztech-muted': '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .table-container {
+            overflow-x: auto;
+        }
+        .table-container table {
+            min-width: 1000px;
+        }
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #1a1a2e;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #8b5cf6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-aztech-dark text-aztech-text font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-aztech-card border-r border-aztech-border fixed h-full">
+            <div class="p-6 border-b border-aztech-border">
+                <h1 class="text-2xl font-bold text-aztech-purple">
+                    <i class="fas fa-shield-halved mr-2"></i>AzTech
+                </h1>
+            </div>
+            <nav class="p-4">
+                <a href="/admin/dashboard?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg">
+                    <i class="fas fa-gauge-high w-6"></i> Dashboard
+                </a>
+                <a href="/admin/users?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-purple bg-purple-500/10 border-l-4 border-aztech-purple rounded-r-lg font-medium mt-2">
+                    <i class="fas fa-users w-6"></i> Users
+                </a>
+                <a href="/admin/apikeys?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-key w-6"></i> API Keys
+                </a>
+                <a href="/admin/usage?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-chart-bar w-6"></i> Usage Stats
+                </a>
+                <a href="/admin/orders?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-shopping-cart w-6"></i> Orders
+                </a>
+                <a href="/admin/test-api?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-flask w-6"></i> Test APIs
+                </a>
+                <a href="/admin/settings?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-cog w-6"></i> Settings
+                </a>
+                <a href="/admin/login" class="flex items-center px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 rounded-r-lg mt-8">
+                    <i class="fas fa-sign-out-alt w-6"></i> Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 flex-1 overflow-y-auto">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-white flex items-center">
+                        <i class="fas fa-users mr-3 text-aztech-purple"></i>
+                        Users Management
+                    </h2>
+                    <button class="bg-aztech-purple text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-600 transition-colors duration-200 shadow-lg" onclick="toggleCreateModal()">
+                        <i class="fas fa-plus mr-2"></i>Create User
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm">Total Users</p>
+                                <p class="text-2xl font-bold text-white">{{ users|length }}</p>
+                            </div>
+                            <i class="fas fa-users text-3xl text-aztech-purple/30"></i>
+                        </div>
+                    </div>
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm">Active</p>
+                                <p class="text-2xl font-bold text-green-400">{% if users %}{{ users|selectattr('active', 'equalto', True)|list|length }}{% else %}0{% endif %}</p>
+                            </div>
+                            <i class="fas fa-check-circle text-3xl text-green-400/30"></i>
+                        </div>
+                    </div>
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm">Paid Users</p>
+                                <p class="text-2xl font-bold text-yellow-400">{% if users %}{{ users|selectattr('plan', 'equalto', 'paid')|list|length + users|selectattr('plan', 'equalto', 'weekly')|list|length + users|selectattr('plan', 'equalto', 'monthly')|list|length }}{% else %}0{% endif %}</p>
+                            </div>
+                            <i class="fas fa-gem text-3xl text-yellow-400/30"></i>
+                        </div>
+                    </div>
+                    <div class="bg-aztech-card border border-aztech-border rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-aztech-muted text-sm">Free Users</p>
+                                <p class="text-2xl font-bold text-gray-400">{% if users %}{{ users|selectattr('plan', 'equalto', 'free')|list|length }}{% else %}0{% endif %}</p>
+                            </div>
+                            <i class="fas fa-user text-3xl text-gray-400/30"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-4 border-b border-aztech-border flex justify-between items-center">
+                        <h5 class="text-lg font-semibold text-white">All Users</h5>
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Search users..." class="bg-aztech-dark border border-aztech-border rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-aztech-purple w-64">
+                            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-aztech-muted"></i>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="w-full">
+                            <thead class="bg-aztech-dark">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Telegram</th>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">API Key</th>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Plan</th>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">APIs</th>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-aztech-border" id="usersTableBody">
+                                {% for user in users %}
+                                <tr class="hover:bg-purple-500/5 transition-colors duration-150">
+                                    <td class="px-6 py-4 text-aztech-muted text-sm">{{ user._id }}</td>
+                                    <td class="px-6 py-4 text-white font-medium">{{ user.name }}</td>
+                                    <td class="px-6 py-4 font-mono text-sm text-aztech-text"><code>{{ user.telegram_id }}</code></td>
+                                    <td class="px-6 py-4">
+                                        <code class="font-mono text-sm text-sky-400 cursor-pointer hover:text-sky-300 truncate block max-w-xs" title="{{ user.api_key }}" onclick="copyToClipboard('{{ user.api_key }}')">{{ user.api_key }}</code>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                            {% if user.plan == 'free' %} bg-gray-500/20 text-gray-300
+                                            {% elif user.plan == 'paid' %} bg-yellow-500/20 text-yellow-400
+                                            {% elif user.plan == 'weekly' %} bg-purple-500/20 text-purple-400
+                                            {% elif user.plan == 'monthly' %} bg-indigo-500/20 text-indigo-400
+                                            {% endif %}">
+                                            {{ user.plan|upper }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-aztech-muted text-sm">{{ user.apis|length }} APIs</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {% if user.active %}
+                                        <span class="text-green-400 flex items-center"><i class="fas fa-check-circle mr-2"></i>Active</span>
+                                        {% else %}
+                                        <span class="text-red-400 flex items-center"><i class="fas fa-times-circle mr-2"></i>Disabled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-2">
+                                            <a href="/admin/user/{{ user._id }}?token={{ token }}" class="w-8 h-8 bg-aztech-purple/20 text-aztech-purple hover:bg-aztech-purple hover:text-white rounded-lg flex items-center justify-center transition-all duration-200" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="/admin/user/{{ user._id }}/reset-key?token={{ token }}" class="w-8 h-8 bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200" title="Reset API Key" onclick="return confirm('Reset API key for {{ user.name }}?');">
+                                                <i class="fas fa-key"></i>
+                                            </a>
+                                            <a href="/admin/user/{{ user._id }}/delete?token={{ token }}" class="w-8 h-8 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200" title="Delete User" onclick="return confirm('Delete user {{ user.name }}? This cannot be undone.');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="8" class="px-6 py-12 text-center text-aztech-muted">
+                                        <i class="fas fa-users-slash text-4xl mb-4 block"></i>
+                                        No users found
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div id="createUserModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-aztech-card border border-aztech-border rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white"><i class="fas fa-user-plus mr-2 text-aztech-purple"></i>Create New User</h3>
+                <button onclick="toggleCreateModal()" class="text-aztech-muted hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="/admin/user/create?token={{ token }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-aztech-text text-sm font-medium mb-2">Full Name</label>
+                    <input type="text" name="name" required placeholder="Enter name" class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all">
+                </div>
+                <div>
+                    <label class="block text-aztech-text text-sm font-medium mb-2">Telegram ID</label>
+                    <input type="number" name="telegram_id" required placeholder="Numeric Telegram ID" class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all">
+                </div>
+                <div>
+                    <label class="block text-aztech-text text-sm font-medium mb-2">Plan</label>
+                    <select name="plan" class="w-full px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all">
+                        <option value="free">Free</option>
+                        <option value="paid">Paid (24h)</option>
+                        <option value="weekly">Weekly (7 days)</option>
+                        <option value="monthly">Monthly (30 days)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-aztech-text text-sm font-medium mb-2">APIs Access</label>
+                    <div class="grid grid-cols-1 gap-2">
+                        <label class="flex items-center text-aztech-muted bg-aztech-dark p-3 rounded-lg cursor-pointer hover:bg-aztech-border transition-all">
+                            <input type="checkbox" name="apis" value="movie_search" class="mr-3 w-4 h-4 accent-aztech-purple"> 
+                            <i class="fas fa-film mr-2 text-aztech-purple"></i> Movie Search
+                        </label>
+                        <label class="flex items-center text-aztech-muted bg-aztech-dark p-3 rounded-lg cursor-pointer hover:bg-aztech-border transition-all">
+                            <input type="checkbox" name="apis" value="image_gen" class="mr-3 w-4 h-4 accent-aztech-purple"> 
+                            <i class="fas fa-image mr-2 text-pink-400"></i> Image Generation
+                        </label>
+                        <label class="flex items-center text-aztech-muted bg-aztech-dark p-3 rounded-lg cursor-pointer hover:bg-aztech-border transition-all">
+                            <input type="checkbox" name="apis" value="phone_lookup" class="mr-3 w-4 h-4 accent-aztech-purple"> 
+                            <i class="fas fa-phone mr-2 text-green-400"></i> Phone Lookup
+                        </label>
+                    </div>
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="toggleCreateModal()" class="flex-1 px-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white hover:bg-aztech-border transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-aztech-purple rounded-lg text-white hover:bg-purple-600 transition-all font-medium">
+                        <i class="fas fa-plus mr-2"></i>Create
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleCreateModal() {
+            const modal = document.getElementById('createUserModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('API Key copied to clipboard!');
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const tableBody = document.getElementById('usersTableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('createUserModal');
+                if (!modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

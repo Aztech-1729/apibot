@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - AzTech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'aztech-purple': '#8b5cf6',
+                        'aztech-indigo': '#6366f1',
+                        'aztech-dark': '#0f0f23',
+                        'aztech-card': '#1a1a2e',
+                        'aztech-border': '#2a2a4a',
+                        'aztech-text': '#e2e8f0',
+                        'aztech-muted': '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-aztech-dark text-aztech-text font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-aztech-card border-r border-aztech-border fixed h-full">
+            <div class="p-6 border-b border-aztech-border">
+                <h1 class="text-2xl font-bold text-aztech-purple">
+                    <i class="fas fa-shield-halved mr-2"></i>AzTech
+                </h1>
+            </div>
+            <nav class="p-4">
+                <a href="/admin/dashboard?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg">
+                    <i class="fas fa-gauge-high w-6"></i> Dashboard
+                </a>
+                <a href="/admin/users?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-users w-6"></i> Users
+                </a>
+                <a href="/admin/apikeys?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-key w-6"></i> API Keys
+                </a>
+                <a href="/admin/usage?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-chart-bar w-6"></i> Usage Stats
+                </a>
+                <a href="/admin/orders?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-purple bg-purple-500/10 border-l-4 border-aztech-purple rounded-r-lg font-medium mt-2">
+                    <i class="fas fa-shopping-cart w-6"></i> Orders
+                </a>
+                <a href="/admin/test-api?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-flask w-6"></i> Test APIs
+                </a>
+                <a href="/admin/settings?token={{ token }}" class="flex items-center px-4 py-3 text-aztech-muted hover:text-aztech-purple hover:bg-purple-500/10 transition-all duration-200 rounded-r-lg mt-2">
+                    <i class="fas fa-cog w-6"></i> Settings
+                </a>
+                <a href="/admin/login" class="flex items-center px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 rounded-r-lg mt-8">
+                    <i class="fas fa-sign-out-alt w-6"></i> Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 flex-1 overflow-y-auto">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-white flex items-center">
+                        <i class="fas fa-shopping-cart mr-3 text-aztech-purple"></i>
+                        Orders Management
+                    </h2>
+                    <div class="flex space-x-2">
+                        <a href="/admin/orders?token={{ token }}&status=all" class="px-4 py-2 rounded-lg {% if status_filter == 'all' %}bg-aztech-purple text-white{% else %}bg-aztech-card text-aztech-muted border border-aztech-border hover:border-aztech-purple{% endif %}">All</a>
+                        <a href="/admin/orders?token={{ token }}&status=pending" class="px-4 py-2 rounded-lg {% if status_filter == 'pending' %}bg-yellow-500/20 text-yellow-400{% else %}bg-aztech-card text-aztech-muted border border-aztech-border hover:border-yellow-500/50{% endif %}">Pending ({{ pending }})</a>
+                        <a href="/admin/orders?token={{ token }}&status=approved" class="px-4 py-2 rounded-lg {% if status_filter == 'approved' %}bg-green-500/20 text-green-400{% else %}bg-aztech-card text-aztech-muted border border-aztech-border hover:border-green-500/50{% endif %}">Approved ({{ approved }})</a>
+                        <a href="/admin/orders?token={{ token }}&status=rejected" class="px-4 py-2 rounded-lg {% if status_filter == 'rejected' %}bg-red-500/20 text-red-400{% else %}bg-aztech-card text-aztech-muted border border-aztech-border hover:border-red-500/50{% endif %}">Rejected ({{ rejected }})</a>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="bg-aztech-card border border-aztech-border rounded-xl shadow-lg overflow-hidden">
+                    <table class="w-full divide-y divide-aztech-border">
+                        <thead class="bg-aztech-dark">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Order ID</th>
+                                <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">User</th>
+                                <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-left text-aztech-muted font-medium text-sm uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-aztech-border">
+                            {% for order in orders %}
+                            <tr class="hover:bg-purple-500/5 transition-colors duration-150">
+                                <td class="px-6 py-4"><code class="text-sky-400">#{{ order.order_id }}</code></td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="text-white font-medium">{{ order.name }}</p>
+                                        <p class="text-aztech-muted text-sm">ID: {{ order.telegram_id }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    {% if order.plan_type %}
+                                        <span class="text-purple-400 font-medium">{{ order.plan_type|upper }} Plan</span>
+                                    {% else %}
+                                        <span class="text-yellow-400 font-medium">{{ order.apis|length }} APIs</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 text-white font-medium">₹{{ order.total }}</td>
+                                <td class="px-6 py-4 text-aztech-muted text-sm">{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else 'N/A' }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                        {% if order.status == 'pending' %} bg-yellow-500/20 text-yellow-400
+                                        {% elif order.status == 'approved' %} bg-green-500/20 text-green-400
+                                        {% elif order.status == 'rejected' %} bg-red-500/20 text-red-400
+                                        {% endif %}">
+                                        {{ order.status|capitalize }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    {% if order.status == 'pending' %}
+                                    <div class="flex space-x-2">
+                                        <a href="/admin/order/{{ order.order_id }}/approve?token={{ token }}" class="text-green-400 hover:text-green-300" title="Approve">
+                                            <i class="fas fa-check-circle"></i>
+                                        </a>
+                                        <a href="/admin/order/{{ order.order_id }}/reject?token={{ token }}" class="text-red-400 hover:text-red-300" title="Reject">
+                                            <i class="fas fa-times-circle"></i>
+                                        </a>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-aztech-muted italic">No actions</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-aztech-muted">
+                                    <i class="fas fa-inbox text-4xl mb-4 block"></i>
+                                    No orders found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

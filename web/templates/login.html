@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AzTech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'aztech-purple': '#8b5cf6',
+                        'aztech-indigo': '#6366f1',
+                        'aztech-dark': '#0f0f23',
+                        'aztech-card': '#1a1a2e',
+                        'aztech-border': '#2a2a4a',
+                        'aztech-text': '#e2e8f0',
+                        'aztech-muted': '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-aztech-dark to-violet-900">
+    <div class="bg-aztech-card border border-aztech-border rounded-2xl shadow-2xl p-8 w-full max-w-md backdrop-blur-sm">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <i class="fas fa-shield-halved text-6xl text-aztech-purple mb-4"></i>
+            <h3 class="text-2xl font-bold text-white">AzTech Admin</h3>
+            <p class="text-aztech-muted mt-2">API Marketplace Dashboard</p>
+        </div>
+
+        <!-- Error Message -->
+        {% if error %}
+        <div class="bg-red-500/10 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg mb-6" role="alert">
+            <i class="fas fa-exclamation-triangle mr-2"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        <!-- Login Form -->
+        <form method="POST" action="/admin/login" class="space-y-6">
+            <div>
+                <label class="block text-aztech-text text-sm font-medium mb-2">Username</label>
+                <div class="relative">
+                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-aztech-muted"></i>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        placeholder="Enter username" 
+                        required 
+                        value="aztech"
+                        class="w-full pl-10 pr-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white placeholder-aztech-muted focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all duration-200"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-aztech-text text-sm font-medium mb-2">Password</label>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-aztech-muted"></i>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Enter password" 
+                        required 
+                        value="1729"
+                        class="w-full pl-10 pr-4 py-3 bg-aztech-dark border border-aztech-border rounded-lg text-white placeholder-aztech-muted focus:outline-none focus:border-aztech-purple focus:ring-2 focus:ring-aztech-purple/20 transition-all duration-200"
+                    >
+                </div>
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full bg-gradient-to-r from-aztech-purple to-violet-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-violet-600 hover:to-aztech-purple transform hover:scale-105 transition-all duration-200 shadow-lg"
+            >
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Secure Login
+            </button>
+        </form>
+
+        <!-- Default Credentials -->
+        <div class="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+            <p class="text-blue-200 text-sm">
+                <i class="fas fa-info-circle mr-2"></i>
+                Default credentials: <strong>aztech / 1729</strong>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
